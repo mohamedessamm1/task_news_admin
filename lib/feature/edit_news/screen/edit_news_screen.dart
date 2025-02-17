@@ -27,9 +27,7 @@ class DetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController titleController = TextEditingController();
-    TextEditingController detailsController = TextEditingController();
-    TextEditingController shortSummaryController = TextEditingController();
+
     return BlocBuilder<HomeManagerCubit, HomeManagerState>(
       builder: (context, state) {
         return Scaffold(
@@ -96,31 +94,48 @@ class DetailsScreen extends StatelessWidget {
                         'العنوان',
                         style: TextStyle(fontSize: 18.sp),
                       ),
+                      SizedBox(height: 5.h,),
+
+                      Text(
+                        '*  ${title}  *',
+                        style: TextStyle(fontSize: 12.sp,color: Colors.teal),
+                      ),
+                      SizedBox(height: 5.h,),
                       textFormFieldWidget(
-                          maxlines: 5,
                           context: context,
-                          controller: titleController..text = title,
+                          controller: HomeManagerCubit.get(context).title,
                           hint: 'العنوان',
                           icon: Icons.edit),
                       Text(
                         'التفاصيل',
                         style: TextStyle(fontSize: 18.sp),
                       ),
+                      SizedBox(height: 5.h,),
+
+                      Text(
+                        '*  ${details}   *',
+                        style: TextStyle(fontSize: 12.sp,color: Colors.teal),
+                      ),
+                      SizedBox(height: 5.h,),
                       textFormFieldWidget(
-                          maxlines: 5,
                           context: context,
-                          controller: detailsController..text = details,
+                          controller: HomeManagerCubit.get(context).details,
                           hint: 'التفاصيل',
                           icon: Icons.edit),
                       Text(
                         'نص قصير عن الخبر',
                         style: TextStyle(fontSize: 18.sp),
                       ),
+                      SizedBox(height: 5.h,),
+
+                      Text(
+                        '*  ${shortSummary}  *',
+                        style: TextStyle(fontSize: 12.sp,color: Colors.teal),
+                      ),
+                      SizedBox(height: 5.h,),
                       textFormFieldWidget(
-                          maxlines: 5,
                           context: context,
-                          controller: shortSummaryController
-                            ..text = shortSummary,
+                          controller: HomeManagerCubit.get(context).shortSummary,
                           hint: 'نص قصير عن الخبر',
                           icon: Icons.edit),
                       SizedBox(
@@ -130,12 +145,22 @@ class DetailsScreen extends StatelessWidget {
                           onTap: () {
                             HomeManagerCubit.get(context).updateData(
                                 context: context,
-                                shortSummary: shortSummaryController.text,
-                                details: detailsController.text,
-                                title: titleController.text,
+                                oldShortSummary:shortSummary,
+                                oldTitle: title.toString(),
+                                oldDetails: details,
+
                                 id: id);
                           },
-                          text: 'حفظ التغييرات')
+                          text: 'حفظ التغييرات'),
+                      SizedBox(height: 10.h,),
+                      customButton(
+                        buttonColor: Colors.red,
+                          onTap: () {
+                            HomeManagerCubit.get(context).deleteNews(
+                                context: context,
+                                id: id);
+                          },
+                          text: 'حذف الخبر'),
                     ],
                   ),
                 ),

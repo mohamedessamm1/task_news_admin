@@ -6,6 +6,8 @@ Widget textFormFieldWidget(
          controller,
         required hint,
           int ?maxlines,
+          Function () ?fun,
+          bool isSaved=false,
           String ?initialValue,
         required icon}) =>
     Directionality(
@@ -20,11 +22,18 @@ Widget textFormFieldWidget(
         ]),
         width: MediaQuery.of(context).size.width - 100,
         child: TextFormField(
+          textInputAction:isSaved==true? TextInputAction.done:null,  // Show "Done" button on the keyboard
+          onSaved: (value) {
+            print("OK");
+          },
+
+
           initialValue:initialValue ,
           controller: controller,
           cursorColor: Colors.grey,
           maxLines: maxlines,
           decoration: InputDecoration(
+
             suffixIcon: Icon(
               icon,
               color: Colors.blue,

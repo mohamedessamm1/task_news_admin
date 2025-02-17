@@ -3,8 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker_web/image_picker_web.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
 part 'home_manager_state.dart';
+
+
 
 class HomeManagerCubit extends Cubit<HomeManagerState> {
   HomeManagerCubit() : super(HomeManagerInitial());
@@ -29,13 +30,17 @@ class HomeManagerCubit extends Cubit<HomeManagerState> {
 
   await  supabaseClient.from('news').select().then((value) {
       newsList = value;
-      print(newsList);
     });
     emit(GetDataFromDataBaseState());
   }
 
   Future<void> editNewspickImage() async {
     editNewsbytesFromPicker = await ImagePickerWeb.getImageAsBytes();
+    editNewsuploadImageBytes(editNewsbytesFromPicker!);
+
+
+    emit(ProfileimgSuccess());
+
     emit(ProfileimgSuccess());
   }
   Future<void> editNewsuploadImageBytes(Uint8List imageBytes) async {
@@ -52,19 +57,22 @@ class HomeManagerCubit extends Cubit<HomeManagerState> {
               .from('news/')
               .getPublicUrl(filePath)
               .toString();
-          print(editNewsImageNameToSupabase);
         },
       );
       emit(ImageSuccessUploadState());
     } catch (e) {
-      print("Error: $e");
     }
   }
 
   Future<void> pickImage() async {
-    bytesFromPicker = await ImagePickerWeb.getImageAsBytes();
+
+
+
+bytesFromPicker = await ImagePickerWeb.getImageAsBytes();
     uploadImageBytes(bytesFromPicker!);
+
     emit(ProfileimgSuccess());
+
   }
 
   Future<void> uploadImageBytes(Uint8List imageBytes) async {
@@ -82,12 +90,10 @@ class HomeManagerCubit extends Cubit<HomeManagerState> {
               .from('news/')
               .getPublicUrl(filePath)
               .toString();
-          print(ImageNameToSupabase);
         },
       );
       emit(ImageSuccessUploadState());
     } catch (e) {
-      print("Error: $e");
     }
   }
 
@@ -134,18 +140,43 @@ emit(RadioChangeState());
 
   Future<void> updateData(
       {
-        required title,
         required context,
-      required shortSummary,
-      required details,
+        required oldTitle,
+        required oldShortSummary,
+        required oldDetails,
       required id
       }) async {
     await Supabase.instance.client
         .from('news')
         .update(
-            {'title': title,
+            {
+              'title': title.text.isNotEmpty? title.text: oldTitle,
+              'details': details.text.isNotEmpty? details.text: oldDetails,
+              'short_summary': shortSummary.text.isNotEmpty? shortSummary.text: oldShortSummary,
               'active':isActive,
-              'short_summary': shortSummary, 'details': details})
+            })
+        .eq('id', id)
+        .then(
+          (value) async{
+            print(title.text.isEmpty);
+           await getDataFromDatabase();
+           title.clear();
+           details.clear();
+           shortSummary.clear();
+            Navigator.pop(context);
+          },
+
+    );
+
+  }
+  Future<void> deleteNews(
+      {
+        required context,
+      required id
+      }) async {
+    await Supabase.instance.client
+        .from('news')
+        .delete()
         .eq('id', id)
         .then(
           (value) async{
